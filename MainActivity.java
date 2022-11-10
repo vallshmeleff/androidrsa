@@ -26,6 +26,11 @@ import java.security.Key;
 // a special class RSACode.java
 // Supports national alphabets (as an example - Czech)
 //
+// 10.11.2022 - Large Text to Encryption Support - RSACode.java
+//
+//         eFragment = eFragment(eText); // Fragmentation
+//         splitted = eDEFragment(toDecode); // Defragmentation
+//
 //=====================================================
 
 
@@ -56,9 +61,12 @@ public class MainActivity extends AppCompatActivity {
     public static byte[] decodedBytes = null; //RSA
     // Original text (RSA)
     public static String testText = "Open Source Java Project Valery Shmelev OFLAMERON. Česká Republika";
+    //public String testText = "WiKi: The Czech Republic, also known as Czechia, is a landlocked country in Central Europe. Historically known as Bohemia, it is bordered by Austria to the south, Germany to the west, Poland to the northeast, and Slovakia to the southeast. The Czech Republic has a hilly landscape that covers an area of 78,871 square kilometers (30,452 sq mi) with a mostly temperate continental and oceanic climate. The capital and largest city is Prague; other major cities and urban areas include Brno, Ostrava, Plzeň and Liberec.";
+
     public static Context Maincontext;
     public ClipboardManager clipboard;
 
+    public static String DebugObfuscation = "13663457956709807959674645";
 
     @RequiresApi(api = Build.VERSION_CODES.R)
     @Override
@@ -102,6 +110,9 @@ public class MainActivity extends AppCompatActivity {
         String txtcyr = rsagente.Code2String(cyrtxt);
         Log.d(LOG_TAG, "== ==| UNICODE CharachterString to TEXT|== ==" + txtcyr);
 
+        // OBFUSCATION
+        String obfustxt = rsagente.ObfuscationD(DebugObfuscation, "5", "7");
+        rsagente.main();
 
         // ============================================================
         // Encode the original text with RSA private key
