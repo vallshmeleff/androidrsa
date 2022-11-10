@@ -33,7 +33,16 @@ import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
-
+//===============================================
+//
+// RSA Code Class - Generate, Save, Load, Restore Keys, Obfuscation, UNICODE
+// RSAeAESCrypto APP RSACode Class
+//
+// API 29 Tested
+//
+// 09.11.2022
+//
+//===============================================
 public class RSACode  extends Application {
     public static String PubKey=""; // String from file - public key
     public static String PrivateKey=""; // String from file - private key
@@ -41,6 +50,22 @@ public class RSACode  extends Application {
     KeyPair kp;  // Key Pair
     public static Context context;
 
+    int dnaCode;
+
+    public boolean equals(RSACode man) { // https://javarush.ru/groups/posts/equals-java-sravnenie-strok
+        return this.dnaCode ==  man.dnaCode;
+    }
+
+    public static void main() { // https://javarush.ru/groups/posts/equals-java-sravnenie-strok
+
+        RSACode man1 = new RSACode();
+        man1.dnaCode = 1111222233;
+
+        RSACode man2 = new RSACode();
+        man2.dnaCode = 1111222233;
+        Log.d(LOG_TAG, "== == ECUALS == == " + (man1.equals(man2)));
+
+    }
 
     public void onCreate(){
         super.onCreate();
@@ -271,5 +296,171 @@ public class RSACode  extends Application {
         return RestoreTXT; //CharCodeString
     }
     //==========================================================
+
+    //==========================================================
+    // Simple digit data obfuscation
+    // String SourceText - String to obfuscate
+    // int e - The digit to be replaced in the original string
+    // int d - Number to change to int e (New value)
+    // Used to process a UNICODE string, or Keys
+    //==========================================================
+    public String ObfuscationD(String SourceText, String e, String d) {
+        String lstr =""; // Obfuscated text
+        String newlstr =""; // Obfuscated text
+        String math1 = "5"; // Что заменить
+        String math2 = "7"; // Чем заменить
+        int h = 0;
+        ////char[] buf = new char[1];
+        String l = "*"; //Временная замена
+
+        if(Integer.parseInt(math1) < 10)
+        {
+            if(Integer.parseInt(math2) < 10)
+            {
+                Log.d(LOG_TAG, "== ==| MATH1 < 10 |== == ");
+                for(h = 0; h < SourceText.length(); h++) {
+                    math1=SourceText.substring(h,h+1); //Write 6 characters i through i+1 to buf array starting from position 0
+                    //// chr = e;
+                    //// Log.d(LOG_TAG, "== ==| OBFUSCATION IF |== == " + math1 + " " + math2);
+                    if (math1.equals(e)) {  //Если найдена цифра 5
+                        Log.d(LOG_TAG, "== ==| OBFUSCATION IF 2 |== == " + d);
+                        lstr = lstr + l; // Заменяем на *
+                    } else {
+                        lstr = lstr + math1;
+                        //// Log.d(LOG_TAG, "== ==| NO |== == ");
+                    }
+                    }
+
+                // 1. Заменили искомую цифру 5 на *  Теперь надо заменить 7 на 5
+                //    1366345*956*0980*9596*4645
+
+                for(h = 0; h < lstr.length(); h++) {
+                    math1=lstr.substring(h,h+1); //Write 6 characters i through i+1 to buf array starting from position 0
+                    //// chr = e;
+                    //// Log.d(LOG_TAG, "== ==| OBFUSCATION IF |== == " + math1 + " " + math2);
+                    if (math1.equals(d)) {  //Если найдена цифра 7 заменяем на 5
+                        Log.d(LOG_TAG, "== ==| OBFUSCATION IF 3 |== == " + d);
+                        newlstr = newlstr + e;
+                    } else {
+                        newlstr = newlstr + math1;
+                        //// Log.d(LOG_TAG, "== ==| NO |== == ");
+                    }
+                }
+                Log.d(LOG_TAG, "== ==| OBFUSCATION 2 |== == " + newlstr);
+
+                // 2. Заменили искомую цифру 7 на 5  Теперь надо заменить * на 7
+                //    136634*59*65098059*965464*
+
+                lstr = "";
+                for(h = 0; h < newlstr.length(); h++) {
+                    math1=newlstr.substring(h,h+1); //Write 6 characters i through i+1 to buf array starting from position 0
+                    //// chr = e;
+                    //// Log.d(LOG_TAG, "== ==| OBFUSCATION IF |== == " + math1 + " " + math2);
+                    if (math1.equals(l)) {  //Если найдена * заменяем на 7
+                        Log.d(LOG_TAG, "== ==| OBFUSCATION IF 4 |== == " + d);
+                        lstr = lstr + d;
+                    } else {
+                        lstr = lstr + math1;
+                        //// Log.d(LOG_TAG, "== ==| NO |== == ");
+                    }
+                }
+                Log.d(LOG_TAG, "== ==| OBFUSCATION 3 |== == " + lstr);
+
+
+            } else {
+                return lstr = "== One Digit Only =="; //Return Obfucated Text
+            }
+       } else {
+            return lstr = "== One Digit Only =="; //Return Obfucated Text
+        }
+
+        Log.d(LOG_TAG, "== ==| OBFUSCATION ALL |== == " + lstr);
+        return lstr; //Return Obfucated Text
+    }
+    //==========================================================
+
+    // ============================================================
+    //
+    // eText string fragmentation
+    // Tested in RSALargeText.java
+    //
+    // FRAGMENTATION
+    //
+    // USE:
+    //
+    //         eFragment = eFragment(eText); // Fragmentation
+    //
+    //  eFragment - Array with text fragments to encrypt
+    //  eText - Text to fragment
+    //  eFragment.lenght - Number of elements in the array
+    //
+    // ============================================================
+    public String[] eFragment(String eText) { // TEXT fragmentation
+        int eL = eText.length(); // eText line length
+        String[] masString = new String[(int) (eL/100)+1]; // Array for string fragments - full 100 bytes each and for the rest
+        if (eText != null || eText.length() > 0) { // If eText string exists and length > zero
+            String Text100 = "";
+            int i = 0; // Number of blocks/fragments
+            int y = 0; // The starting position of the block in the eText line
+            int e = 0; // Fragment count in masString summit
+            if (eL >= 100) {
+                int x = eL / 100;
+                i = (int) x; // Integer from division
+            } else {
+                i = 0;
+            }
+
+
+            while (i > 0) { // As long as there is text for at least one block
+                Text100 = eText.substring(y, y + 100);
+                i = i - 1;
+                if (e == 0) {
+                    masString [e] = Text100; // Write to block array
+                } else {
+                    masString[e] = "<oflameron>" + Text100; // Write to block array
+                }
+                Log.d("== Block==", "== == eText Block == == " + masString [e]);
+                e = e + 1; // Next Block Array Number
+                y = y + 100;
+            }
+            if (i == 0) {
+                Text100 =eText.substring(y, eL);
+                masString [e] = "<oflameron>" + Text100; // Write to block array
+                Log.d("== Block==", "== == eText Block == == " + masString [e]);
+            }
+            // Crypto RSA (c) by Valery Shmelev https://www.linkedin.com/in/valery-shmelev-479206227/
+        }
+        return masString; //Return Text array - Fragments array
+
+    } // eFragment(String eText)
+
+
+    // ============================================================
+    //
+    // toDecode string DEfragmentation
+    // Tested in RSALargeText.java
+    //
+    // DEFRAGMENTATION
+    //
+    // USE:
+    //
+    //  splitted = eDEFragment(toDecode); // Defragmentation
+    //
+    //  toDecode - Ciphertext with delimiters to split into blocks
+    //  splitted - Array of blocks to decode without delimiters
+    //  splitted.lenght - Number of elements in the array
+    //
+    // ============================================================
+    public String[] eDEFragment(String toDecode) {
+        // ============================================================
+        // Defragmenting an eText string
+        // ============================================================
+        String[] splitted = toDecode.split("<oflameron>"); // Split encrypted string by delimiter and write to array
+        return splitted; //Return Text array
+    }
+
+
+
+
 
 }
