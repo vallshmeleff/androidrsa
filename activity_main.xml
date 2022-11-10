@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView  xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="fill_parent"
+    tools:context=".MainActivity">
+    <!-- Scrolling Activity Support -->
+    <TableLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:shrinkColumns = "*"
+        android:id="@+id/tableLayout1">
+
+        <TableRow
+            android:id="@+id/tableRow1"
+            android:layout_width="match_parent"
+            android:layout_height="150dp">
+
+            <EditText
+                android:id="@+id/TXTV"
+                android:layout_width="401dp"
+                android:lines="10"
+                android:minLines="9"
+                android:scrollbars="vertical"
+                android:text="RSA Text to Encoding"
+                android:textSize="20sp" />
+        </TableRow>
+        <TableRow
+            android:id="@+id/tableRow2"
+            android:layout_width="match_parent"
+            android:layout_height="150dp">
+            <EditText
+                android:id="@+id/EditTextEncoded"
+                android:layout_width="match_parent"
+                android:lines="10"
+                android:minLines="9"
+                android:text="textViewEncoded"
+                android:textSize="20sp"
+                android:scrollbars = "vertical"
+                />
+        </TableRow>
+        <TableRow
+            android:id="@+id/tableRow3"
+            android:layout_width="match_parent"
+            android:layout_height="150dp">
+            <EditText
+                android:id="@+id/EditTextDecoded"
+                android:layout_width="match_parent"
+                android:lines="10"
+                android:minLines="9"
+                android:text="textViewDecoded"
+                android:textSize="20sp"
+                android:scrollbars="vertical"
+                />
+        </TableRow>
+        <TableRow
+            android:id="@+id/tableRow4"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <Button
+                android:id="@+id/button1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:onClick="onClickW"
+                android:text="Write ClipBoard" />
+        </TableRow>
+        <TableRow
+            android:id="@+id/tableRow5"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <Button
+                android:id="@+id/button2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:onClick="onClickR"
+                android:text="Read ClipBoard" />
+        </TableRow>
+        <TableRow
+            android:id="@+id/tableRow6"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <Button
+                android:id="@+id/button3"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Code Text and Save" />
+        </TableRow>
+        <TableRow
+            android:id="@+id/tableRow7"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <Button
+                android:id="@+id/button4"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Load and Decode Text" />
+        </TableRow>
+        <TableRow
+            android:id="@+id/tableRow8"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <Button
+                android:id="@+id/button5"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Restore Keys Pair" />
+        </TableRow>
+
+    </TableLayout>
+
+</ScrollView>
