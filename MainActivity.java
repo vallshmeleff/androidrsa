@@ -1,4 +1,4 @@
-package com.example.rsaeaescrypto;
+﻿package com.example.rsaeaescrypto;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -59,9 +59,15 @@ public class MainActivity extends AppCompatActivity {
     public static byte[] publicKeyBytes = null; //RSA
     public static byte[] encodedBytes = null; //RSA
     public static byte[] decodedBytes = null; //RSA
+    public static byte[] fragmentBytes = null; //RSA
+    public static byte[] decodefragmentBytes = null; //RSA
     // Original text (RSA)
     public static String testText = "Open Source Java Project Valery Shmelev OFLAMERON. Česká Republika";
-    //public String testText = "WiKi: The Czech Republic, also known as Czechia, is a landlocked country in Central Europe. Historically known as Bohemia, it is bordered by Austria to the south, Germany to the west, Poland to the northeast, and Slovakia to the southeast. The Czech Republic has a hilly landscape that covers an area of 78,871 square kilometers (30,452 sq mi) with a mostly temperate continental and oceanic climate. The capital and largest city is Prague; other major cities and urban areas include Brno, Ostrava, Plzeň and Liberec.";
+    public static String gtestText = "WiKi: The Czech Republic, also known as Czechia, is a landlocked country in Central Europe. Historically known as Bohemia, it is bordered by Austria to the south, Germany to the west, Poland to the northeast, and Slovakia to the southeast. The Czech Republic has a hilly landscape that covers an area of 78,871 square kilometers (30,452 sq mi) with a mostly temperate continental and oceanic climate. The capital and largest city is Prague; other major cities and urban areas include Brno, Ostrava, Plzeň and Liberec.";
+    public static String etestText; // Text to encrypt - all or blocks of text
+    public String[] eFragment = new String[100]; // The array contains a large text to encrypt, divided into chunks
+    public String[] eeFragment = new String[100]; // The array contains a encrypted large text, divided into chunks
+    public static String EncodeLargeText = ""; // Full Encoded Large Text
 
     public static Context Maincontext;
     public ClipboardManager clipboard;
@@ -74,6 +80,13 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Maincontext = getApplicationContext(); //To work with context
+
+                    // ============= Array RESIZE =================================
+                    String[] eLFragment = new String[100];
+                    Log.d("== Array RESIZE ==", "== == 100 == ==" + eLFragment.length);
+                    eLFragment = new String[190];
+                    Log.d("== Array RESIZE ==", "== == 190 == ==" + eLFragment.length);
+                    // ============================================================
 
         // ============================================================
         // Write to clipboard for export/import
@@ -103,21 +116,64 @@ public class MainActivity extends AppCompatActivity {
         // ============================================================
 
 
-        // Convert Text to CharCodeString
+        // Convert Text to CharCodeString =============================
         String cyrtxt = rsagente.String2Code(testText);
         Log.d(LOG_TAG, "== ==| Text to CharachterString |== ==" + cyrtxt);
         // Convert CharCodeString to Text
         String txtcyr = rsagente.Code2String(cyrtxt);
         Log.d(LOG_TAG, "== ==| UNICODE CharachterString to TEXT|== ==" + txtcyr);
+        //=============================================================
 
-        // OBFUSCATION
+        // Here Text to Encode - in UNICODE format in txtcyr variable
+        //
+
+
+        // OBFUSCATION ================================================
         String obfustxt = rsagente.ObfuscationD(DebugObfuscation, "5", "7");
         rsagente.main();
+        //=============================================================
 
         // ============================================================
-        // Encode the original text with RSA private key
+        // Encode the original LARGE text with RSA private key
         // ============================================================
+        if (gtestText.length() >= 50) { // If LARGE text lenght > 50 bytes - LONG Text
+            String eFragment[] = new String[rsagente.eFragment(gtestText).length]; // Array eFragment[] RESIZE
+            String eeFragment[] = new String[eFragment.length]; // eFragment.lenght = eeFragment.lenght
+            eFragment = rsagente.eFragment(gtestText); // Fragmentation - eFragment[] Fragment Array
+            int el = eFragment.length; // Fragment number
+            int n = 0;
+            while  (n < el) {
+                if (n == 0) {
+                    EncodeLargeText = Base64.encodeToString(rsagente.RSATextEncode(publicKey, privateKey, eFragment[n]), Base64.DEFAULT);
+                }
+                if (n > 0) {
+                    EncodeLargeText = EncodeLargeText + "<oflameron>" + Base64.encodeToString(rsagente.RSATextEncode(publicKey, privateKey, eFragment[n]), Base64.DEFAULT);
+                }
+                n++;
+            }
+        }
+
+        // ============================================================
+        // Split and Decode LARGE Encoded Text
+        // ============================================================
+        eeFragment = rsagente.eDEFragment(EncodeLargeText);
+        int g = eeFragment.length;
+        int h = 0;
+        String RestoreText = ""; // Restored Large Text
+        for(h = 0; h < g; h++) {
+            fragmentBytes = Base64.decode(eeFragment[h], Base64.DEFAULT);;
+            decodefragmentBytes  = rsagente.RSATextDecode(publicKey, privateKey,fragmentBytes); //Text decoding (publicKey = KeyMass[0], privateKey = KeyMass[1])
+            RestoreText = RestoreText + new String(decodefragmentBytes);
+        }
+        Log.d("==LARGE Text==", "== ==| RESTORED Source Large Text |== == " +  RestoreText); // Full RESTORED Original Text
+        // ============================================================
+
+
+
+
+
         encodedBytes = rsagente.RSATextEncode(publicKey, privateKey, testText); //Encode text via RSACode.java class
+        /////////// encodedBytes = rsagente.RSATextEncode(publicKey, privateKey, testText); //Encode text via RSACode.java class
 
         EditText encodedEditText = (EditText)findViewById(R.id.EditTextEncoded);
         encodedEditText.setMovementMethod(new ScrollingMovementMethod()); //Scrolling text + android:scrollbars = "vertical" in Activity_main.xml
