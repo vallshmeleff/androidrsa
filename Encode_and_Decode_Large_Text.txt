@@ -1,0 +1,56 @@
+
+
+
+
+
+Java code in MainActivity.java 
+Splitting large text into blocks of 50 characters, RSA encryption of blocks, adding <oflameron> tags for subsequent splitting of the encoded string, assembling a large encoded string from 
+blocks. Splitting a large encoded string into tags <oflameron>, decoding blocks, assembling the original text (Czech Wiki) string (LOG entry)
+
+        // ============================================================
+        // Encode the original LARGE text with RSA private key
+        // ============================================================
+        if (gtestText.length() >= 50) { // If LARGE text lenght > 50 bytes - LONG Text
+            String eFragment[] = new String[rsagente.eFragment(gtestText).length]; // Array eFragment[] RESIZE
+            String eeFragment[] = new String[eFragment.length]; // eFragment.lenght = eeFragment.lenght
+            eFragment = rsagente.eFragment(gtestText); // Fragmentation - eFragment[] Fragment Array
+            int el = eFragment.length; // Fragment number
+            int n = 0;
+            while  (n < el) {
+                if (n == 0) {
+                    EncodeLargeText = Base64.encodeToString(rsagente.RSATextEncode(publicKey, privateKey, eFragment[n]), Base64.DEFAULT);
+                }
+                if (n > 0) {
+                    EncodeLargeText = EncodeLargeText + "<oflameron>" + Base64.encodeToString(rsagente.RSATextEncode(publicKey, privateKey, eFragment[n]), Base64.DEFAULT);
+                }
+                n++;
+            }
+        }
+
+        // ============================================================
+        // Split and Decode LARGE Encoded Text
+        // ============================================================
+        eeFragment = rsagente.eDEFragment(EncodeLargeText);
+        int g = eeFragment.length;
+        int h = 0;
+        String RestoreText = ""; // Restored Large Text
+        for(h = 0; h < g; h++) {
+            fragmentBytes = Base64.decode(eeFragment[h], Base64.DEFAULT);;
+            decodefragmentBytes  = rsagente.RSATextDecode(publicKey, privateKey,fragmentBytes); //Text decoding (publicKey = KeyMass[0], privateKey = KeyMass[1])
+            RestoreText = RestoreText + new String(decodefragmentBytes);
+        }
+        Log.d("==LARGE Text==", "== ==| RESTORED Source Large Text |== == " +  RestoreText); // Full RESTORED Original Text
+        // ============================================================
+
+
+
+
+
+
+
+
+
+
+
+
+
