@@ -397,37 +397,45 @@ public class RSACode  extends Application {
     // ============================================================
     public String[] eFragment(String eText) { // TEXT fragmentation
         int eL = eText.length(); // eText line length
-        String[] masString = new String[(int) (eL/100)+1]; // Array for string fragments - full 100 bytes each and for the rest
+        String[] masString = new String[(int) (eL/50)+1]; // Array for string fragments - full 100 bytes each and for the rest
         if (eText != null || eText.length() > 0) { // If eText string exists and length > zero
             String Text100 = "";
             int i = 0; // Number of blocks/fragments
             int y = 0; // The starting position of the block in the eText line
             int e = 0; // Fragment count in masString summit
-            if (eL >= 100) {
-                int x = eL / 100;
+            if (eL >= 50) {
+                int x = eL / 50;
                 i = (int) x; // Integer from division
-            } else {
-                i = 0;
-            }
-
-
-            while (i > 0) { // As long as there is text for at least one block
-                Text100 = eText.substring(y, y + 100);
-                i = i - 1;
-                if (e == 0) {
-                    masString [e] = Text100; // Write to block array
-                } else {
-                    masString[e] = "<oflameron>" + Text100; // Write to block array
+                while (i > 0) { // As long as there is text for at least one block
+                    Text100 = eText.substring(y, y + 50);
+                    i = i - 1;
+                    if (e == 0) {
+                        masString [e] = Text100; // Write to block array
+                    } else {
+                        //////////masString[e] = "<oflameron>" + Text100; // Write to block array
+                        masString[e] = Text100; // Write to block array
+                    }
+                    Log.d("== Block==", "== == Large Block == == ["+ e +"] " + masString [e]);
+                    e = e + 1; // Next Block Array Number
+                    y = y + 50;
                 }
-                Log.d("== Block==", "== == eText Block == == " + masString [e]);
-                e = e + 1; // Next Block Array Number
-                y = y + 100;
+                if (i == 0) {
+                    Text100 =eText.substring(y, eL);
+                    ////////////masString [e] = "<oflameron>" + Text100; // Write to block array
+                    masString [e] = Text100; // Write to block array
+                    Log.d("== Block==", "== == eText Block == == ["+ e +"] " + masString [e]);
+                }
+            } else {
+                //i = 0;
+                if (i == 0) {
+                    Text100 =eText.substring(y, eL);
+                    ///////////masString [e] = "<oflameron>" + Text100; // Write to block array
+                    masString [e] = Text100; // Write to block array
+                    Log.d("== Block==", "== == eText Block == == ["+ e +"] " + masString [e]);
+                }
             }
-            if (i == 0) {
-                Text100 =eText.substring(y, eL);
-                masString [e] = "<oflameron>" + Text100; // Write to block array
-                Log.d("== Block==", "== == eText Block == == " + masString [e]);
-            }
+
+
             // Crypto RSA (c) by Valery Shmelev https://www.linkedin.com/in/valery-shmelev-479206227/
         }
         return masString; //Return Text array - Fragments array
