@@ -1,5 +1,4 @@
-package com.example.rsaeaescrypto;
-
+﻿package com.example.sqlitersa;
 import java.security.SecureRandom;
 import android.app.Application;
 import android.content.ClipData;
@@ -33,16 +32,22 @@ import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
-//===============================================
+//==================================================
 //
 // RSA Code Class - Generate, Save, Load, Restore Keys, Obfuscation, UNICODE
 // RSAeAESCrypto APP RSACode Class
 //
 // API 29 Tested
 //
-// 09.11.2022
+//==================================================
 //
-//===============================================
+// RSACode class
+//
+// 16.11.2022 Added method for simple obfuscation - ObfuscationD
+//            Method for fragmenting large texts (for SQLite) - eFragment
+//            Method for DEfragmenting large texts (for SQLite) - eDEFragment
+//
+//==================================================
 public class RSACode  extends Application {
     public static String PubKey=""; // String from file - public key
     public static String PrivateKey=""; // String from file - private key
@@ -52,7 +57,7 @@ public class RSACode  extends Application {
 
     int dnaCode;
 
-    public boolean equals(RSACode man) { // https://javarush.ru/groups/posts/equals-java-sravnenie-strok
+    public boolean equals(RSACode man) { 
         return this.dnaCode ==  man.dnaCode;
     }
 
@@ -63,7 +68,10 @@ public class RSACode  extends Application {
 
         RSACode man2 = new RSACode();
         man2.dnaCode = 1111222233;
+
+        //// System.out.println(man1.equals(man2));
         Log.d(LOG_TAG, "== == ECUALS == == " + (man1.equals(man2)));
+
 
     }
 
@@ -138,7 +146,8 @@ public class RSACode  extends Application {
         byte[] encodedBytes = null; //RSA
         try {
             Cipher c = Cipher.getInstance("RSA");
-            c.init(Cipher.ENCRYPT_MODE, privateKey);
+            c.init(Cipher.ENCRYPT_MODE, publicKey);
+            ///////////c.init(Cipher.ENCRYPT_MODE, privateKey);
             encodedBytes = c.doFinal(PlainText.getBytes());
         } catch (Exception e) {
             Log.e("Crypto", "RSA encryption error");
@@ -159,8 +168,13 @@ public class RSACode  extends Application {
         // Decode the encoded data with RSA public key
         try {
             Cipher c = Cipher.getInstance("RSA");
-            c.init(Cipher.DECRYPT_MODE, publicKey);
+            Log.d("== == SQLite","==================1================");
+
+            c.init(Cipher.DECRYPT_MODE, privateKey);
+            //////////////c.init(Cipher.DECRYPT_MODE, publicKey);
+            Log.d("== == SQLite","==================2================");
             decodedBytes = c.doFinal(encodedBytes);
+            Log.d("== == SQLite","==================3================");
         } catch (Exception e) {
             Log.e("Crypto", "RSATextDecode.PUBLIC Key " + publicKey.toString());
             Log.e("Crypto", "RSATextDecode.RSACode RSA decryption error");
@@ -297,6 +311,9 @@ public class RSACode  extends Application {
     }
     //==========================================================
 
+
+    //==========================================================
+
     //==========================================================
     // Simple digit data obfuscation
     // String SourceText - String to obfuscate
@@ -307,12 +324,11 @@ public class RSACode  extends Application {
     public String ObfuscationD(String SourceText, String e, String d) {
         String lstr =""; // Obfuscated text
         String newlstr =""; // Obfuscated text
-        String math1 = "5"; // Что заменить
-        String math2 = "7"; // Чем заменить
+        String math1 = "5"; 
+        String math2 = "7"; 
         int h = 0;
         ////char[] buf = new char[1];
-        String l = "*"; //Временная замена
-
+        String l = "*"; 
         if(Integer.parseInt(math1) < 10)
         {
             if(Integer.parseInt(math2) < 10)
@@ -329,16 +345,14 @@ public class RSACode  extends Application {
                         lstr = lstr + math1;
                         //// Log.d(LOG_TAG, "== ==| NO |== == ");
                     }
-                    }
+                }
 
-                // 1. Заменили искомую цифру 5 на *  Теперь надо заменить 7 на 5
-                //    1366345*956*0980*9596*4645
 
                 for(h = 0; h < lstr.length(); h++) {
                     math1=lstr.substring(h,h+1); //Write 6 characters i through i+1 to buf array starting from position 0
                     //// chr = e;
                     //// Log.d(LOG_TAG, "== ==| OBFUSCATION IF |== == " + math1 + " " + math2);
-                    if (math1.equals(d)) {  //Если найдена цифра 7 заменяем на 5
+                    if (math1.equals(d)) {  
                         Log.d(LOG_TAG, "== ==| OBFUSCATION IF 3 |== == " + d);
                         newlstr = newlstr + e;
                     } else {
@@ -348,15 +362,14 @@ public class RSACode  extends Application {
                 }
                 Log.d(LOG_TAG, "== ==| OBFUSCATION 2 |== == " + newlstr);
 
-                // 2. Заменили искомую цифру 7 на 5  Теперь надо заменить * на 7
-                //    136634*59*65098059*965464*
+
 
                 lstr = "";
                 for(h = 0; h < newlstr.length(); h++) {
                     math1=newlstr.substring(h,h+1); //Write 6 characters i through i+1 to buf array starting from position 0
                     //// chr = e;
                     //// Log.d(LOG_TAG, "== ==| OBFUSCATION IF |== == " + math1 + " " + math2);
-                    if (math1.equals(l)) {  //Если найдена * заменяем на 7
+                    if (math1.equals(l)) {  //
                         Log.d(LOG_TAG, "== ==| OBFUSCATION IF 4 |== == " + d);
                         lstr = lstr + d;
                     } else {
@@ -370,7 +383,7 @@ public class RSACode  extends Application {
             } else {
                 return lstr = "== One Digit Only =="; //Return Obfucated Text
             }
-       } else {
+        } else {
             return lstr = "== One Digit Only =="; //Return Obfucated Text
         }
 
@@ -412,7 +425,7 @@ public class RSACode  extends Application {
                     if (e == 0) {
                         masString [e] = Text100; // Write to block array
                     } else {
-                        //////////masString[e] = "<oflameron>" + Text100; // Write to block array
+                        
                         masString[e] = Text100; // Write to block array
                     }
                     Log.d("== Block==", "== == Large Block == == ["+ e +"] " + masString [e]);
@@ -421,7 +434,7 @@ public class RSACode  extends Application {
                 }
                 if (i == 0) {
                     Text100 =eText.substring(y, eL);
-                    ////////////masString [e] = "<oflameron>" + Text100; // Write to block array
+                    
                     masString [e] = Text100; // Write to block array
                     Log.d("== Block==", "== == eText Block == == ["+ e +"] " + masString [e]);
                 }
@@ -429,7 +442,7 @@ public class RSACode  extends Application {
                 //i = 0;
                 if (i == 0) {
                     Text100 =eText.substring(y, eL);
-                    ///////////masString [e] = "<oflameron>" + Text100; // Write to block array
+                   
                     masString [e] = Text100; // Write to block array
                     Log.d("== Block==", "== == eText Block == == ["+ e +"] " + masString [e]);
                 }
@@ -466,6 +479,7 @@ public class RSACode  extends Application {
         String[] splitted = toDecode.split("<oflameron>"); // Split encrypted string by delimiter and write to array
         return splitted; //Return Text array
     }
+
 
 
 
