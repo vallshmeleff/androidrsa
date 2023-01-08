@@ -320,6 +320,7 @@ public class RSACode  extends Application {
     // int e - The digit to be replaced in the original string
     // int d - Number to change to int e (New value)
     // Used to process a UNICODE string, or Keys
+    // To obfuscate the data, we will write a separate class
     //==========================================================
     public String ObfuscationD(String SourceText, String e, String d) {
         String lstr =""; // Obfuscated text
